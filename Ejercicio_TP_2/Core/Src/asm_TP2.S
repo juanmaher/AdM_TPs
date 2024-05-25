@@ -2,9 +2,9 @@
  * asm_TP2.S
  *
  *  Created on: May 16, 2024
- *      Author: flealu
- *Antes S mayuscula nos dejaba utilizar primitivas
- *de preprosesamiento, o sea, macros
+ *      Authors: Federico Alderisi, Juan Manuel Hernández and Jorge Vasquez
+ *
+ *
  */
 
 .text 	// Sección de texto: se indica que en esta sección hay código para ejecutar
@@ -58,7 +58,7 @@ asm_max:
 
 	_loop2:
 		subs r1, #1
-		bmi _exit2
+		beq _exit2
 
 		ldr r3, [r0, r1, LSL #2]
 		cmp r3, r2
@@ -93,18 +93,22 @@ asm_downSample:
 		udiv r4, r2, r3 // r4 = longitud / N
 		sub r4, r2, r4 // longitudOut
 
+
 _loop3:
 
 		udiv r5, r2, r3
-		mul r5, r5, r3
+		mul r5, r3
 		cmp r5, r2
 		it eq
 		subeq r2, #1
+
 		sub r4, #1
 		sub r2, #1
+
 		ldr r6, [r0, r2, LSL #2]
 		str r6, [r1, r4, LSL #2]
-		subs r2, #1
+
+		cmp r2, #0
 		bne _loop3
 
 

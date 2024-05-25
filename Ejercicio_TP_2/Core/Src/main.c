@@ -105,10 +105,15 @@ int main(void)
 
 		/* ----------- Función Ejercicio 2 ----------- */
 
+	uint32_t longitud_max = 6;
+	int32_t vectorIn_max [] = {6,3,7,8,1,3};
+	int32_t out_max;
 
+	out_max= max(vectorIn_max, longitud_max);
 
+	out_max=0;
 
-
+	out_max= asm_max(vectorIn_max, longitud_max);
 		/* ----------- Función Ejercicio 2 ----------- */
 
 
@@ -116,10 +121,10 @@ int main(void)
 
 		/* ----------- Función Ejercicio 3 ----------- */
 
-	int32_t vectorIn_dS [] = {1,2,3,4,5,6/*,7,8,9,10,11,12*/};
-	int32_t vectorOut_dS [] = {0,0,0/*,0,0,0,0,0*/};
-	uint32_t longitud_dS = 6;
-	uint32_t N = 2;
+	int32_t vectorIn_dS [] = {1,2,3,4,5,6,7,8,9,10,11,12};
+	int32_t vectorOut_dS [] = {0,0,0,0,0,0,0,0};
+	uint32_t longitud_dS = 12;
+	uint32_t N = 3;
 
 	downSample(vectorIn_dS,vectorOut_dS,longitud_dS,N);
 

@@ -65,6 +65,9 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 /* USER CODE BEGIN PFP */
 void pack32to16 (int32_t * vectorIn, int16_t *vectorOut, uint32_t longitud);
+void invertir (uint16_t * vector, uint32_t longitud);
+uint32_t max (int32_t * vectorIn, uint32_t longitud);
+void downSample (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -100,11 +103,53 @@ int main(void)
 
 
 
+		/* ----------- Función Ejercicio 2 ----------- */
+
+
+
+
 
 		/* ----------- Función Ejercicio 2 ----------- */
 
 
-		/* ----------- Función Ejercicio 2 ----------- */
+
+
+		/* ----------- Función Ejercicio 3 ----------- */
+
+	int32_t vectorIn_dS [] = {1,2,3,4,5,6/*,7,8,9,10,11,12*/};
+	int32_t vectorOut_dS [] = {0,0,0/*,0,0,0,0,0*/};
+	uint32_t longitud_dS = 6;
+	uint32_t N = 2;
+
+	downSample(vectorIn_dS,vectorOut_dS,longitud_dS,N);
+
+	memset(vectorOut_dS,0,sizeof(vectorOut_dS));
+
+	asm_downSample(vectorIn_dS, vectorOut_dS, longitud_dS, N);
+
+
+
+		/* ----------- Función Ejercicio 3 ----------- */
+
+
+
+
+
+		/* ----------- Función Ejercicio 4 ----------- */
+	uint32_t longitud4 = 5;
+	uint16_t vector[] = {10,11,12,13,14};
+	uint16_t vector_asm [] = {10,11,12,13,14};
+
+	invertir (vector, longitud4);
+
+	asm_invertir (vector_asm, longitud4);
+
+
+
+
+
+
+		/* ----------- Función Ejercicio 4 ----------- */
 
 
   /* USER CODE END 1 */
@@ -375,6 +420,52 @@ void pack32to16 (int32_t * vectorIn, int16_t *vectorOut, uint32_t longitud){
 
 }
 
+
+void invertir (uint16_t * vector, uint32_t longitud) {
+	uint16_t swap_a, swap_b;
+	for (uint32_t i = longitud, j = 0; j<i ; i--, j++) {
+		swap_a = vector[i-1];
+		swap_b = vector[j];
+		vector[j] = swap_a;
+		vector[i-1] = swap_b;
+	}
+}
+
+uint32_t max (int32_t * vectorIn, uint32_t longitud) {
+	int32_t aux = vectorIn[0];
+	for (uint32_t i = longitud; i > 0; i--) {
+		if (vectorIn[i-1] > aux)
+			aux = vectorIn[i-1];
+	}
+	return aux;
+}
+
+void downSample (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N){
+
+//L - L/N
+
+	// 1 2 3 4 5 6
+	// 2
+	// 1 3 5
+
+	uint32_t longitudOut = longitud - longitud/N;
+	uint32_t aux = longitudOut;
+
+	for(uint32_t i = longitud; i > 0; i--, aux--){
+
+		if( (i%N) == 0){
+		i--;
+		}
+
+		vectorOut[aux - 1] = vectorIn[i - 1];
+
+
+	}
+
+
+
+
+}
 
 
 /* USER CODE END 4 */

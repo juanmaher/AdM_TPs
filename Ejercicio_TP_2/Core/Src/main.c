@@ -65,9 +65,9 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 /* USER CODE BEGIN PFP */
 void pack32to16 (int32_t * vectorIn, int16_t *vectorOut, uint32_t longitud);
-void invertir (uint16_t * vector, uint32_t longitud);
 uint32_t max (int32_t * vectorIn, uint32_t longitud);
 void downSample (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N);
+void invertir (uint16_t * vector, uint32_t longitud);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -85,74 +85,63 @@ int main(void)
 
 		/* ----------- Función Ejercicio 1 ----------- */
 
-	uint32_t longitud = 3;
-	int32_t vectorIn [] = {0b10101010101010101111111111111111, 0b01111111111010111001011010011101, 0b10101001100000011011011110111111};
-	int16_t vectorOut [] = {0,0,0};
+    uint32_t longitud = 3;
+    int32_t vectorIn [] = {0b10101010101010101111111111111111, 0b01111111111010111001011010011101, 0b10101001100000011011011110111111};
+    int16_t vectorOut [] = {0,0,0};
 
+    pack32to16(vectorIn, vectorOut, longitud);
 
-	pack32to16 (vectorIn, vectorOut, longitud);
+    for(uint8_t index = 0; index < longitud; index++)
+      vectorOut[index] = 0;
 
-	for(uint8_t index = 0; index < longitud; index++)
-	vectorOut[index] = 0;
-
-	asm_pack32to16 (vectorIn, vectorOut, longitud);
-
+    asm_pack32to16(vectorIn, vectorOut, longitud);
 
 		/* ----------- Función Ejercicio 1 ----------- */
 
 
 
-
 		/* ----------- Función Ejercicio 2 ----------- */
 
-	uint32_t longitud_max = 6;
-	int32_t vectorIn_max [] = {6,3,7,8,1,3};
-	int32_t out_max;
+    uint32_t longitud_max = 6;
+    int32_t vectorIn_max [] = {6,3,7,8,1,3};
+    int32_t out_max;
 
-	out_max= max(vectorIn_max, longitud_max);
+    out_max= max(vectorIn_max, longitud_max);
 
-	out_max=0;
+    out_max=0;
 
-	out_max= asm_max(vectorIn_max, longitud_max);
+    out_max= asm_max(vectorIn_max, longitud_max);
+
 		/* ----------- Función Ejercicio 2 ----------- */
-
 
 
 
 		/* ----------- Función Ejercicio 3 ----------- */
 
-	int32_t vectorIn_dS [] = {1,2,3,4,5,6,7,8,9,10,11,12};
-	int32_t vectorOut_dS [] = {0,0,0,0,0,0,0,0};
-	uint32_t longitud_dS = 12;
-	uint32_t N = 3;
+    int32_t vectorIn_dS [] = {1,2,3,4,5,6,7,8,9,10,11,12};
+    int32_t vectorOut_dS [] = {0,0,0,0,0,0,0,0};
+    uint32_t longitud_dS = 12;
+    uint32_t N = 3;
 
-	downSample(vectorIn_dS,vectorOut_dS,longitud_dS,N);
+    downSample(vectorIn_dS,vectorOut_dS,longitud_dS,N);
 
-	memset(vectorOut_dS,0,sizeof(vectorOut_dS));
+    memset(vectorOut_dS,0,sizeof(vectorOut_dS));
 
-	asm_downSample(vectorIn_dS, vectorOut_dS, longitud_dS, N);
-
-
+    asm_downSample(vectorIn_dS, vectorOut_dS, longitud_dS, N);
 
 		/* ----------- Función Ejercicio 3 ----------- */
-
-
 
 
 
 		/* ----------- Función Ejercicio 4 ----------- */
-	uint32_t longitud4 = 5;
-	uint16_t vector[] = {10,11,12,13,14};
-	uint16_t vector_asm [] = {10,11,12,13,14};
 
-	invertir (vector, longitud4);
+    uint32_t longitud4 = 5;
+    uint16_t vector[] = {10,11,12,13,14};
+    uint16_t vector_asm [] = {10,11,12,13,14};
 
-	asm_invertir (vector_asm, longitud4);
+    invertir(vector, longitud4);
 
-
-
-
-
+    asm_invertir(vector_asm, longitud4);
 
 		/* ----------- Función Ejercicio 4 ----------- */
 
@@ -414,30 +403,31 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-void pack32to16 (int32_t * vectorIn, int16_t *vectorOut, uint32_t longitud){
-
-	for(uint8_t i = longitud; i > 0; i--){
-
-		vectorOut[i-1] = vectorIn[i-1]>>16;
-
-	}
-
-
-}
-
-
-void invertir (uint16_t * vector, uint32_t longitud) {
-	uint16_t swap_a, swap_b;
-	for (uint32_t i = longitud, j = 0; j<i ; i--, j++) {
-		swap_a = vector[i-1];
-		swap_b = vector[j];
-		vector[j] = swap_a;
-		vector[i-1] = swap_b;
+/**
+ * @brief Reciba un vector de números signados de 32 bits y los
+ * “empaqueta” en otro vector de 16 bits, guardando la parte alta (MSB).
+ * 
+ * @param vectorIn: vector de 32 bits
+ * @param vectorOut: vector de 16 bits
+ * @param longitud: longitud del vector
+*/
+void pack32to16 (int32_t * vectorIn, int16_t *vectorOut, uint32_t longitud) {
+	for(uint8_t i = longitud; i > 0; i--) {
+		vectorOut[i-1] = vectorIn[i-1] >> 16;
 	}
 }
 
+/**
+ * @brief Recibe un vector de números signados de 32 bits y devuelve la
+ * posición del máximo del vector.
+ * 
+ * @param vectorIn: vector de 32 bits
+ * @param longitud: longitud del vector
+ * @return la posición del máximo del verctor
+*/
 uint32_t max (int32_t * vectorIn, uint32_t longitud) {
 	int32_t aux = vectorIn[0];
+
 	for (uint32_t i = longitud; i > 0; i--) {
 		if (vectorIn[i-1] > aux)
 			aux = vectorIn[i-1];
@@ -445,33 +435,41 @@ uint32_t max (int32_t * vectorIn, uint32_t longitud) {
 	return aux;
 }
 
-void downSample (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N){
+/**
+ * @brief Recibe un vector de muestras signadas de 32 bits y descarta una
+ * de cada N muestras. Si se impone en la aplicación que N siempre es múltiplo de longitud.
+ * 
+ * @param vectorIn: vector de 32 bits
+ * @param vectorOut: vector de 32 bits
+ * @param longitud: longitud del vector
+ * @param N: cantidad de muestras
+*/
+void downSample (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N) {
+	uint32_t j = longitud - longitud/N;
 
-//L - L/N
-
-	// 1 2 3 4 5 6
-	// 2
-	// 1 3 5
-
-	uint32_t longitudOut = longitud - longitud/N;
-	uint32_t aux = longitudOut;
-
-	for(uint32_t i = longitud; i > 0; i--, aux--){
-
-		if( (i%N) == 0){
-		i--;
-		}
-
-		vectorOut[aux - 1] = vectorIn[i - 1];
-
-
+	for(uint32_t i = longitud; i > 0; i--, j--){
+		if((i%N) == 0)
+		  i--;
+		vectorOut[j - 1] = vectorIn[i - 1];
 	}
-
-
-
-
 }
 
+/**
+ * @brief Recibe un vector de muestras signadas de 16 bits y lo invierte.
+ * 
+ * @param vector: vector de 16 bits
+ * @param longitud: longitud del vector
+*/
+void invertir (uint16_t * vector, uint32_t longitud) {
+	uint16_t swap_a, swap_b;
+
+	for (uint32_t i = longitud, j = 0; j < i; i--, j++) {
+		swap_a = vector[i-1];
+		swap_b = vector[j];
+		vector[j] = swap_a;
+		vector[i-1] = swap_b;
+	}
+}
 
 /* USER CODE END 4 */
 
